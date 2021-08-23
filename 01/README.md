@@ -347,3 +347,48 @@ Error: No formulae found in taps.
 
 今度こそ [libvirt: Domain XML format](https://libvirt.org/formatdomain.html) を斜め読みました。すいません。
 で、 https://libvirt.org/drvqemu.html#example-domain-xml-config に作例があってのでそれをいじっていこうと思います。
+
+
+```bash
+qemu-system-x86_64 \
+ -drive if=pflash,file=./OVMF_CODE.fd \
+ -drive if=pflash,file=./OVMF_VARS.fd \
+ -hda disk.img
+```
+
+…で、 `-hda disk.img` ってのがこういう書きっぷりに対応するんだろうなってのは分かるんだけど
+
+```xml
+...
+    <disk type='file' device='disk'>
+      <source file='~/github.com/say3no/try_mikanos/01/disk.img'/>
+      <target dev='hda'/>
+    </disk>
+...
+```
+
+`-drive if=pflash,file=./OVMF_VARS.fd` の `-drive` ってなんだ？ やっぱ .fd ってフロッピーディスクだったんかなあ。つーか interface `pflash` ってなによ。
+
+ググって出る記事を適当に読んで見る。ふーむ。よくわからん。
+
+* [第441回　QEMU/KVMでUEFIファームウェアを使う：Ubuntu Weekly Recipe｜gihyo.jp … 技術評論社](https://gihyo.jp/admin/serial/01/ubuntu-recipe/0441) 
+* [QEMUでゲストをSecure Bootする - Qiita](https://qiita.com/kakinaguru_zo/items/6b4ff0baed197a0ebf44) 
+
+とりあえず libvirt の xml doc で `pflash` とか `ovmf` とか覚えたてのワードで調べていると `Operating System booting` でヒットした。ああなるほどね、 `<os firmware='efi'>` とある。 あれ、でも U はどこいった…？
+
+そんでもって `loader` やら `nvram` をいじっていけばいいのね。 `nvram` はでんプチしても揮発しない、ってのは知っているからこの辺をいい感じに書き換えたらワンちゃんありそうじゃん！
+
+```xml
+...
+<os firmware='efi'>
+  <type>hvm</type>
+  <loader readonly='yes' secure='no' type='rom'>/usr/lib/xen/boot/hvmloader</loader>
+  <nvram template='/usr/share/OVMF/OVMF_VARS.fd'>/var/lib/libvirt/nvram/guest_VARS.fd</nvram>
+  <boot dev='hd'/>
+  <boot dev='cdrom'/>
+  <bootmenu enable='yes' timeout='3000'/>
+  <smbios mode='sysinfo'/>
+  <bios useserial='yes' rebootTimeout='0'/>
+</os>
+...
+```
