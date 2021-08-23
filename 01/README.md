@@ -287,4 +287,63 @@ wiki から引用した絵にはないけど、そのうちここに kube-virt �
 
 [Running virt-manager and libvirt on macOS](https://www.arthurkoziel.com/running-virt-manager-and-libvirt-on-macos/) によれば
 
+```
+❯ brew services start libvirt
 
+==> Tapping homebrew/services
+Cloning into '/opt/homebrew/Library/Taps/homebrew/homebrew-services'...
+remote: Enumerating objects: 1399, done.
+remote: Counting objects: 100% (278/278), done.
+remote: Compressing objects: 100% (203/203), done.
+remote: Total 1399 (delta 107), reused 213 (delta 70), pack-reused 1121
+Receiving objects: 100% (1399/1399), 414.30 KiB | 2.24 MiB/s, done.
+Resolving deltas: 100% (584/584), done.
+Tapped 1 command (28 files, 509.9KB).
+==> Successfully started `libvirt` (label: homebrew.mxcl.libvirt)
+
+~ took 3s 
+❯ virt-manager -c "qemu:///session" --no-fork
+zsh: segmentation fault  virt-manager -c "qemu:///session" --no-fork
+
+~ 
+❯ 
+```
+
+セグフォってるやんけ〜〜〜〜
+は〜〜〜俺は libvirt にわたす xml を楽して作りたかっただけなのになんで virt-manager も oVirt も macOS に入らねえんだよ〜〜〜
+
+### libvirt の doc みながら 例のアレから xml を書き起こすか…
+
+というわけで [libvirt: Domain XML format](https://libvirt.org/formatdomain.html) を読んでいこっかな…。やりたいのはこれだけなんすけどね。
+
+```bash
+qemu-system-x86_64 -drive if=pflash,file=./OVMF_CODE.fd -drive if=pflash,file=./OVMF_VARS.fd -hda disk.img
+```
+
+でググっていったら `virt-xml` ってのがあるのをしった。そりゃそうっすよね！ `virt-xml-validate` ってあるんですもんね！！！
+
+```
+❯ brew install virt-xml
+Warning: No available formula or cask with the name "virt-xml". Did you mean virt-manager?
+==> Searching for similarly named formulae...
+This similarly named formula was found:
+virt-manager
+To install it, run:
+  brew install virt-manager
+==> Searching for a previously deleted formula (in the last month)...
+Error: No previously deleted formula found.
+==> Searching taps on GitHub...
+Error: No formulae found in taps.
+
+~ took 4s 
+❯ 
+
+```
+
+はーうんちうんちうんち！！！
+
+雛形の xml だけでもほしいので 自宅 k8s のUbuntuで virt-manager いれて virt-xml-edit でdumpしてみよ...
+で見てみたんですけど すでに存在している domain の xml を編集するっていうニュアンスを感じ取れました、ああ辛い…
+
+今度こそ [libvirt: Domain XML format](https://libvirt.org/formatdomain.html) を斜め読みました。すいません。
+で、 https://libvirt.org/drvqemu.html#example-domain-xml-config に作例があってのでそれをいじっていこうと思います。
