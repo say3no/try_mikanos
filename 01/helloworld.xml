@@ -1,8 +1,68 @@
 <domain type='qemu'>
   <name>hellowold</name>
   <uuid>327AB668-1150-408D-81BF-B70B9E85DC30</uuid>
+  <!-- domain.os 
+    os ってのは Opeating system booting のことを意味してる？
+    firmware は efi, bios いずれかを
+    -->
+  <os firmware='efi'>
+    <!-- domain.os.type
+      type要素の内容は、仮想マシンで起動するOSの種類を指定するらしい。
+      hvm, linux のいずれか？ hvm は完全仮想化？ linux は悪い命名でXen3で使う？
+    -->
+    <type>hvm</type> 
+    <!-- domain.os.loader
+      loaderは Xenの完全仮想化ドメインかQEMUで使われる。今回は使うんだよな…？
+      readonly は文字通り。
+      type は rom か pflash(!)が入る。ローダパスがUEFIイメージを指定している場合、typeはpflashじゃないとだめ。
+      secure は firmware がセキュアブートに対応していることをHVに伝えるためにある。helloworldはたぶん対応してない
+    -->
+    <loader readonly='yes' secure='no' type='pflash'>/Users/sanosei/github.com/say3no/try_mikanos/01/OVMF_CODE.fd</loader> 
+    <!-- domain.os.nvram
+      UEFIファームウェアの中にはいくつかの変数を保存するために不揮発性メモリを使用したいものもある。そういうときに。
+      template="/path/to/file" って属性で変数のデフォ値を与えておくこともできるっぽい？ 今回はいらないので消しちゃう
+    -->
+    <nvram>/Users/sanosei/github.com/say3no/try_mikanos/01/OVMF_CODE.fd</nvram>
+    <!-- domain.os.boot
+      dev は fd, hd, cdrom, network のいずれか。読み込ませたいブートデバイスを書けばいい
+      boot を複数書くことで、順番に試すブートデバイスの優先順位リストを設定することもできる
+
+      今回は <devices> に <disk> <target dev="hda"/></disk> とあるので、こいつをbootさせたい
+
+      disk device が複数個あった場合は、 dev name で sort するらしいんだがよくわからんな。うん。
+      boot順を希望通りに設定するのは難しそうなので、deviceの方にboot要素を追加できるようにしたから
+      それを設定したほうがいいよーとのこと。
+    -->
+    <boot dev='hd'/>
+    <!-- domain.os.bootmenu
+      ゲスト起動時にインタラクティブなブートメニューを有効にするかどうか。 
+     -->
+    <bootmenu enable='no' timeout='3000'/>
+    <!-- domain.os.smbios
+      smbios ってなに？
+    
+     -->
+    <smbios mode='sysinfo'/>
+    <!-- domain.os.bios
+      useserial は yes or no, シリアルポートでBIOSメッセージを見ることができるシリアルグラフィックアダプタを有効または無効に…する？
+      そのためシリアルポートが定義されている必要がある…？
+      rebootTimeout は [-1,65535]ミリ秒。
+      bootが失敗した場合にゲストが再びブートを開始するかどうか、どのくらい時間が経過してからブートを開始するか。
+     -->
+    <bios useserial='no' rebootTimeout='-1'/>
+  </os>
   <devices>
+  <!-- domain.devices
+
+  -->
+    <!-- domain.emulator
+
+    -->
     <emulator>/usr/bin/qemu-system-x86_64</emulator>
+    <!-- domain.devices.disk
+      type: file, block, dir, network, volume, nvme(ssd?), vhostuser のいずれか
+      device: floppy, disk, cdrom, lun(?) のいずれか。デフォは disk. 
+    -->
     <disk type='file' device='disk'>
       <source file='~/github.com/say3no/try_mikanos/01/disk.img'/>
       <target dev='hda'/>

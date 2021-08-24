@@ -230,7 +230,6 @@ Sun Aug 22 19:17:35 JST 2021
  Id   Name   State
 --------------------
 
-
 ~ 
 $
 ```
@@ -391,4 +390,18 @@ qemu-system-x86_64 \
   <bios useserial='yes' rebootTimeout='0'/>
 </os>
 ...
+```
+
+
+* SMBIOSってなに?
+* まだ途中だから別にいいんだけどvirt-xml-validate 売ったらerrorでまくっておこなんだけど？？？
+
+```
+❯ virt-xml-validate helloworld.xml 
+Relax-NG validity error : Extra element source in interleave
+Relax-NG validity error : Extra element devices in interleave
+helloworld.xml:54: element devices: Relax-NG validity error : Element domain failed to validate content
+helloworld.xml fails to validate
+
+try_mikanos/01 on  main [!] 
 ```
