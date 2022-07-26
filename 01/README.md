@@ -39,7 +39,7 @@ $ hdiutil attach -mountpoint mnt disk.img
 /dev/disk4  /Users/sanosei/github.com/say3no/try_mikanos/01/mnt
 $ mkdir -p mnt/EFI/BOOT
 $ cp bootx64.efi mnt/EFI/BOOT/BOOTX64.EFI
-cp: bootx64.efi: could not copy extended attributes to mnt/EFI/BOOT/BOOTX64.EFI: Attribute not found
+
 $ ls -hal mnt/EFI/BOOT/BOOTX64.EFI 
 -rwxrwxrwx  1 sanosei  staff   1.5K  8 22 01:25 mnt/EFI/BOOT/BOOTX64.EFI*
 $ hdiutil detach mnt
@@ -59,7 +59,6 @@ $ curl -O https://raw.githubusercontent.com/uchan-nos/mikanos-build/master/deven
 $ md5 OVMF_VARS.fd 
 MD5 (OVMF_VARS.fd) = bb627eb9250889d6a5f80e27cb6f3cd5
 ```
-
 
 >Open Virtual Machine Firmware (OVMF) は仮想マシンで UEFI を使えるようにするプロジェクトです。Linux 3.9 以上と新しいバージョンの QEMU では、グラフィックカードをパススルーすることが可能で、仮想マシンでネイティブと同じグラフィック性能を発揮することができます。
 >
@@ -98,7 +97,6 @@ Input/Output Memory Management Unit だとさ。DMA(Direct Memory Access)可能�
 IOMMUの話をするために、たんなる MMU を知らないといけない。 Memory Management Unit は物理部品の一つ。ざくっと仮想と物理のアドレスマップを管理するのが主要な役割のようだ。それに付随してメモリ保護機能やらキャッシュ制御、バス調停機能などがあるらしい。
 
 たんなるMMUはCPUとMemoryの間で物理と仮想のマップを管理していた。IOMMUはDeviceとMemoryの間で物理と仮想のマップを管理しているのだろう。
-
 
 ほか、 syuu1228 さんの記事もヒットした。このチームに居る限りにはいつか読もうと思ってまったく読めてない。ついでに読もうかな
 
@@ -212,7 +210,6 @@ $ pstree -p 64454
 
 ~ 
 $ 
-
 ```
 
 macosには pmap はなかった。かなしい。
